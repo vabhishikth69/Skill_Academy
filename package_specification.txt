@@ -1,0 +1,13 @@
+create or replace package xx2_validate_journals is
+
+	procedure load_data(errbuf out varchar2,retcode out number);
+
+	function validate_name(v_name varchar2) return boolean;
+
+	function validate_flags(v_reference varchar2,v_approval varchar2) return boolean;
+
+	function validate_date(v_effective varchar2) return boolean;
+
+	procedure insert_error(v_name varchar2,v_key varchar2,v_desc varchar2,v_reference varchar2,v_approval varchar2,v_import varchar2,v_override varchar2,v_effective varchar2);
+
+end xx2_validate_journals;

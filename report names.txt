@@ -1,0 +1,40 @@
+Executable Name - XX2_AP_INVOICE_REPORT
+Executable Short Name - XX2_AP_INVOICE_REPORT
+Application - Payables
+Executable File Name - XX2_AP_INVOICE_REPORT
+
+Program Name - Skill Academy Ap Invoice Report 2A
+Program Short Name - XX2-AP_INVOICE_REPORT
+
+Data Definition Name - Skill Academy Ap Invoice Report 2A
+Code - XX2_AP_INVOICE_REPORT
+
+Template Name - AP_INVOICE_TMP
+
+
+
+
+
+
+
+
+Interface:-
+
+data file - XXGL_SOURCES_DATA.csv
+control file - XXGL_CTL.ctl
+Executable Name(Executable Short Name,Program Short Name) - XXGL_CTL
+Application - Application Utilities
+Program - Skill Academy Ctl 2A
+Request Group - Application Developer Reports (Application Object Library)
+
+Control File:   /u01/clone/BRZL/apps/apps_st/appl/au/12.0.0/bin/XXGL_CTL.ctl
+Data File:      /u01/clone/BRZL/apps/apps_st/appl/au/12.0.0/bin/XXGL_SOURCES_DATA.csv
+Bad File:     /u01/clone/BRZL/inst/apps/BRZL_in-mum-pkgora/logs/appl/conc/out/o6286391.out
+Discard File: /u01/clone/BRZL/inst/apps/BRZL_in-mum-pkgora/logs/appl/conc/out/o6286391.out 
+
+package - xx2_validate_journals
+
+procedure - load_data
+
+staging table - xx2_journal_table
+

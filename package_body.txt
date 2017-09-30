@@ -1,0 +1,84 @@
+create or replace package body xx2_validate_journals is
+
+procedure load_data(errbuf out varchar2,retcode out number) is
+	cursor c is select user_je_source_name,je_source_key,description,journal_reference_flag,journal_approval_flag,import_using_key_flag,override_edits_flag,effective_date_rule_code from appsread.xxgl_table;
+	v_name appsread.xxgl_table.user_je_source_name%type;
+	v_key appsread.xxgl_table.je_source_key%type;
+	v_desc appsread.xxgl_table.description%type;
+	v_reference appsread.xxgl_table.journal_reference_flag%type;
+	v_approval appsread.xxgl_table.journal_approval_flag%type;
+	v_import appsread.xxgl_table.import_using_key_flag%type;
+	v_override appsread.xxgl_table.override_edits_flag%type;
+	v_effective appsread.xxgl_table.effective_date_rule_code%type;
+begin
+	open c;
+	loop
+		fetch c into v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective;
+		exit when c%notfound;
+		if(validate_name(v_name)) then
+			if(v_key is NULL) then
+				v_key := v_name;
+			end if;
+			if(validate_flags(v_reference,v_approval)) then
+				if(validate_date(v_effective)) then
+					insert into appsread.xx2_journal_table(user_je_source_name,je_source_key,description,journal_reference_flag,journal_approval_flag,import_using_key_flag,override_edits_flag,effective_date_rule_code) values(v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective);
+					fnd_file.put_line(fnd_file.output, 'Inserted Records : ' || chr(9) || v_name ||' ; '|| v_key ||' ; '|| v_desc ||' ; '|| v_reference ||' ; '|| v_approval ||' ; '|| v_import ||' ; '|| v_override ||' ; '|| v_effective);
+				else
+					insert_error(v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective);
+				end if;
+			else
+				insert_error(v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective);
+			end if;
+		else
+			insert_error(v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective);
+		end if;
+	end loop;
+	close c;
+end load_data;
+
+function validate_name(v_name varchar2) return boolean is
+	cnt number;
+begin
+	if(v_name is NULL) then
+		return false;
+	else
+		select count(user_je_source_name) into cnt from appsread.xx2_journal_table where user_je_source_name = v_name;
+		if(cnt = 0) then
+			return true;
+		else
+			return false;
+		end if;
+	end if;
+end validate_name;
+
+function validate_flags(v_reference varchar2,v_approval varchar2) return boolean is
+
+begin
+	if(v_reference is NULL OR v_approval is NULL) then
+		return false;
+	else
+		return true;
+	end if;
+end validate_flags;
+
+function validate_date(v_effective varchar2) return boolean is
+
+begin
+	if(v_effective is NULL) then
+		return false;
+	else
+		return true;
+	end if;
+end validate_date;
+
+procedure insert_error(v_name varchar2,v_key varchar2,v_desc varchar2,v_reference varchar2,v_approval varchar2,v_import varchar2,v_override varchar2,v_effective varchar2) is
+
+begin
+	insert into appsread.xx2_journal_error(user_je_source_name,je_source_key,description,journal_reference_flag,journal_approval_flag,import_using_key_flag,override_edits_flag,effective_date_rule_code) values(v_name,v_key,v_desc,v_reference,v_approval,v_import,v_override,v_effective);
+
+	fnd_file.put_line(fnd_file.log, 'Rejected Records : ' || chr(9) || v_name ||' ; '|| v_key ||' ; '|| v_desc ||' ; '|| v_reference ||' ; '|| v_approval ||' ; '|| v_import ||' ; '|| v_override ||' ; '|| v_effective);
+
+end insert_error;
+
+end xx2_validate_journals;
+
